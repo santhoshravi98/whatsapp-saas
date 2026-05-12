@@ -1,0 +1,40 @@
+:root {
+  color: #171717;
+  background: #f8fafc;
+  font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+.workspace-content {
+  flex: 1;
+  padding: 32px;
+}
+
+.dashboard h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.dashboard p {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.7);
+}

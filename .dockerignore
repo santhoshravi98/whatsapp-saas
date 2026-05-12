@@ -1,0 +1,15 @@
+.git
+.next
+.env
+.env.local
+node_modules
+apps/*/.next
+apps/*/.env.local
+apps/*/node_modules
+services/*/.env
+services/*/.env.development
+services/*/.env.production
+services/*/node_modules
+packages/*/node_modules
+services/backend/secrets
+*.log

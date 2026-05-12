@@ -1,0 +1,13 @@
+node_modules
+.next
+dist
+.turbo
+.env
+.env.local
+*.log
+*service-account*.json
+*firebase-adminsdk*.json
+services/backend/secrets/
+.vercel
+.claude/
+.DS_Store

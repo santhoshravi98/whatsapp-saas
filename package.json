@@ -1,0 +1,23 @@
+{
+  "name": "whatsapp-saas",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.7.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:landing": "turbo dev --filter=@whatsapp-saas/landing",
+    "dev:web": "turbo dev --filter=@whatsapp-saas/web-app",
+    "dev:backend": "turbo dev --filter=@whatsapp-saas/backend",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.0.9",
+    "typescript": "^5.5.4"
+  }
+}
