@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Icons } from "./Icons";
-import { BigHeading, Pill, Reveal, SectionLabel, Sub } from "./Primitives";
+import { BigHeading, Pill, Reveal, Scroll3D, SectionLabel, Sub } from "./Primitives";
 import { useScrollProgress } from "./hooks";
 
 type TabId = "overview" | "campaigns" | "automation" | "templates";
@@ -424,7 +424,15 @@ export const PortalModule = () => {
           </div>
         </Reveal>
 
-        <div className="mt-14 glass rounded-2xl p-2 sm:p-3 overflow-hidden">
+        <div
+          className="mt-14"
+          style={{ perspective: "2200px", perspectiveOrigin: "50% 30%" }}
+        >
+        <Scroll3D
+          className="glass rounded-2xl p-2 sm:p-3 overflow-hidden"
+          intensity={0.5}
+          lift={0.5}
+        >
           <div className="flex items-center justify-between px-3 py-2 border-b hairline">
             <div className="flex items-center gap-2">
               <div className="flex gap-1.5">
@@ -490,6 +498,7 @@ export const PortalModule = () => {
               {tab === "templates" && <TemplatesTab />}
             </main>
           </div>
+        </Scroll3D>
         </div>
 
         <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-2 text-[12px]">

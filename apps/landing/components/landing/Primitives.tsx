@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type ElementType, type ReactNode, type CSSProperties } from "react";
-import { useReveal } from "./hooks";
+import { useReveal, useScrollProgress } from "./hooks";
 
 export const Eyebrow = ({
   children,
@@ -156,6 +156,71 @@ export const FloatCard = ({
   style?: CSSProperties;
 }) => (
   <div className={`glass rounded-xl p-3 ${className}`} style={style}>
+    {children}
+  </div>
+);
+
+// Scroll-driven 3D panel — tilts forward as it enters, flat at center, tips back as it exits.
+type Scroll3DProps = {
+  children: ReactNode;
+  className?: string;
+  intensity?: number;
+  lift?: number;
+  axis?: "x" | "y" | "both";
+  style?: CSSProperties;
+};
+
+export const Scroll3D = ({
+  children,
+  className = "",
+  intensity = 1,
+  lift = 1,
+  axis = "x",
+  style = {},
+}: Scroll3DProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const p = useScrollProgress(ref);
+  const tilt = (0.5 - p) * 28 * intensity;
+  const z = (1 - Math.abs(0.5 - p) * 2) * 80 * lift;
+  const rot =
+    axis === "x"
+      ? `rotateX(${tilt}deg)`
+      : axis === "y"
+        ? `rotateY(${tilt}deg)`
+        : `rotateX(${tilt}deg) rotateY(${tilt * 0.4}deg)`;
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        ...style,
+        transformStyle: "preserve-3d",
+        transform: `${rot} translateZ(${z}px)`,
+        transition: "transform .25s cubic-bezier(.2,.7,.2,1)",
+        willChange: "transform",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Perspective stage — gives a section a deep camera so children's 3D reads
+export const Stage3D = ({
+  children,
+  className = "",
+  perspective = 1600,
+  origin = "50% 30%",
+}: {
+  children: ReactNode;
+  className?: string;
+  perspective?: number;
+  origin?: string;
+}) => (
+  <div
+    className={className}
+    style={{ perspective: `${perspective}px`, perspectiveOrigin: origin }}
+  >
     {children}
   </div>
 );

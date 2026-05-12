@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Icons } from "./Icons";
-import { BigHeading, Reveal, SectionLabel, Sub } from "./Primitives";
+import { BigHeading, Reveal, Scroll3D, SectionLabel, Sub } from "./Primitives";
 import { useCountUp, useScrollProgress } from "./hooks";
 
 type ReminderStatus = "sent" | "replied" | "paid";
@@ -68,9 +68,12 @@ export const ReminderModule = () => {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div
+          className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-6"
+          style={{ perspective: "2000px", perspectiveOrigin: "50% 30%" }}
+        >
           <div className="lg:col-span-8">
-            <div className="glass rounded-2xl p-4 sm:p-5">
+            <Scroll3D className="glass rounded-2xl p-4 sm:p-5" intensity={0.55} lift={0.6}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 text-[12px] text-ink-200">
                   <Icons.Car size={14} className="text-accent" /> Hyundai · Bengaluru West · May
@@ -185,7 +188,7 @@ export const ReminderModule = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Scroll3D>
           </div>
 
           <div className="lg:col-span-4">

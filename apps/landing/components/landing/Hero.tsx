@@ -1,11 +1,10 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { Icons } from "./Icons";
-import { Bubble, FloatCard } from "./Primitives";
+import { Bubble } from "./Primitives";
 import { useMouseParallax } from "./hooks";
-import { HeroBackdrop } from "./HeroBackdrop";
-import { Hero3D } from "./Hero3D";
 
 const heroMessages = [
   { f: "them" as const, name: "Priya · Salon", t: "Hi! Booking a hair spa for Saturday 4pm?", time: "10:22" },
@@ -56,6 +55,155 @@ const HeroPhoneScreen = () => (
   </div>
 );
 
+// 3D perspective floor grid receding behind the phone
+const PerspectiveFloor = ({ parallax }: { parallax: { x: number; y: number } }) => (
+  <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      className="absolute left-1/2 top-[68%] h-[700px] w-[160vw] -translate-x-1/2"
+      style={{
+        transform: `translateX(-50%) rotateX(${66 + parallax.y * 1.5}deg) rotateZ(${parallax.x * 1.2}deg)`,
+        transformOrigin: "50% 0%",
+        backgroundImage:
+          "linear-gradient(to right, rgba(37,211,102,0.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
+        backgroundSize: "64px 64px, 64px 64px",
+        maskImage: "radial-gradient(60% 60% at 50% 0%, #000 30%, transparent 80%)",
+        WebkitMaskImage: "radial-gradient(60% 60% at 50% 0%, #000 30%, transparent 80%)",
+        transition: "transform .3s ease-out",
+      }}
+    />
+  </div>
+);
+
+// 8-card conversation deck flanking the phone — uniform orientation
+type MsgCard = { kind: "msg"; who: string; msg: string; tick?: boolean };
+type MetricCard = { kind: "metric"; label: string; big: string; sub: string };
+type ChartCard = { kind: "chart"; label: string; val: string; spark: number[] };
+type FlowCard = { kind: "flow"; label: string; steps: string[] };
+type BadgeCard = { kind: "badge"; label: string; sub: string };
+type DeckCard = (MsgCard | MetricCard | ChartCard | FlowCard | BadgeCard) & {
+  dx: number;
+  dy: number;
+  dz: number;
+  rot: number;
+  w: number;
+};
+
+const deckCards: DeckCard[] = [
+  // Left column — dx = -450 (cards grow rightward from their anchor, so this pushes the right edges close to the phone)
+  { kind: "msg", who: "Naturals · Spa", msg: "Booked! See you Sat 11:30", tick: true, dx: -450, dy: -170, dz: 0, rot: 0, w: 210 },
+  { kind: "metric", label: "Messages · 24h", big: "412,808", sub: "+18% vs yest", dx: -450, dy: -20, dz: 0, rot: 0, w: 210 },
+  { kind: "msg", who: "BITS Admissions", msg: "Counsellor call at 4pm", tick: false, dx: -450, dy: 130, dz: 0, rot: 0, w: 210 },
+  { kind: "flow", label: "Salon flow · live", steps: ["Service ✓", "Stylist ✓", "Payment …"], dx: -450, dy: 270, dz: 0, rot: 0, w: 210 },
+  // Right column — dx = 240
+  { kind: "msg", who: "Hyundai Service", msg: "₹4,200 paid ✓", tick: true, dx: 240, dy: -170, dz: 0, rot: 0, w: 210 },
+  { kind: "chart", label: "Read rate", val: "87.4%", spark: [20, 28, 22, 38, 34, 52, 46, 58], dx: 240, dy: -20, dz: 0, rot: 0, w: 210 },
+  { kind: "msg", who: "Apollo Clinic", msg: "Pre-visit form sent →", tick: true, dx: 240, dy: 130, dz: 0, rot: 0, w: 210 },
+  { kind: "badge", label: "Reply auto-routed", sub: "avg 0.4s", dx: 240, dy: 270, dz: 0, rot: 0, w: 210 },
+];
+
+const ConversationDeck = ({ parallax }: { parallax: { x: number; y: number } }) => (
+  <div
+    className="pointer-events-none absolute inset-0 hidden md:flex items-center justify-center"
+    aria-hidden="true"
+  >
+    <div
+      className="relative"
+      style={{
+        transformStyle: "preserve-3d",
+        transform: `rotateX(${6 + parallax.y * 2}deg) rotateY(${parallax.x * 3}deg)`,
+        transition: "transform .3s ease-out",
+      }}
+    >
+      {deckCards.map((c, i) => {
+        const style: CSSProperties = {
+          width: c.w,
+          transform: `translate3d(${c.dx + parallax.x * (Math.abs(c.dz) / 8)}px, ${c.dy + parallax.y * (Math.abs(c.dz) / 10)}px, ${c.dz}px) rotateZ(${c.rot}deg)`,
+          transition: "transform .3s ease-out",
+        };
+        return (
+          <div
+            key={i}
+            className="absolute rounded-2xl bg-[#11141a]/90 backdrop-blur-md ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] px-3.5 py-2.5"
+            style={style}
+          >
+            {c.kind === "msg" && (
+              <>
+                <div className="flex items-center justify-between text-[10.5px] text-ink-400 font-mono uppercase tracking-wider">
+                  <span>{c.who}</span>
+                  {c.tick && <span className="text-accent">✓✓</span>}
+                </div>
+                <div className="mt-1 text-[12.5px] text-ink-100 leading-snug">{c.msg}</div>
+              </>
+            )}
+            {c.kind === "metric" && (
+              <>
+                <div className="text-[10px] text-ink-400 font-mono uppercase tracking-wider">
+                  {c.label}
+                </div>
+                <div className="mt-1 font-display text-[22px] tracking-tight text-ink-100">
+                  {c.big}
+                </div>
+                <div className="text-[10.5px] text-accent">{c.sub}</div>
+              </>
+            )}
+            {c.kind === "chart" && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] text-ink-400 font-mono uppercase tracking-wider">
+                    {c.label}
+                  </div>
+                  <div className="text-[12px] text-accent font-medium">{c.val}</div>
+                </div>
+                <svg viewBox="0 0 100 28" className="mt-2 w-full h-7" preserveAspectRatio="none">
+                  <polyline
+                    points={c.spark
+                      .map(
+                        (v, j) =>
+                          `${j * (100 / (c.spark.length - 1))},${28 - (v / 60) * 24}`,
+                      )
+                      .join(" ")}
+                    fill="none"
+                    stroke="#25D366"
+                    strokeWidth="1.6"
+                  />
+                </svg>
+              </>
+            )}
+            {c.kind === "flow" && (
+              <>
+                <div className="text-[10px] text-ink-400 font-mono uppercase tracking-wider">
+                  {c.label}
+                </div>
+                <div className="mt-1.5 space-y-1 text-[11.5px] text-ink-100">
+                  {c.steps.map((s, j) => (
+                    <div key={j} className="flex items-center gap-1.5">
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          s.includes("…") ? "bg-accent animate-pulse" : "bg-accent"
+                        }`}
+                      />
+                      {s}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {c.kind === "badge" && (
+              <>
+                <div className="flex items-center gap-1.5 text-[11px] text-ink-100">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  {c.label}
+                </div>
+                <div className="text-[10.5px] text-ink-400 font-mono mt-0.5">{c.sub}</div>
+              </>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
 export const Hero = () => {
   const parallax = useMouseParallax(1);
   const [scrollY, setScrollY] = useState(0);
@@ -74,8 +222,7 @@ export const Hero = () => {
       style={{ perspective: "1800px" }}
     >
       <div className="pointer-events-none absolute inset-0 dot-grid opacity-40 [mask-image:radial-gradient(60%_50%_at_50%_30%,#000_30%,transparent_80%)]" />
-      <HeroBackdrop parallax={parallax} />
-      <Hero3D className="pointer-events-none fixed inset-0 z-0 opacity-70" />
+      <PerspectiveFloor parallax={parallax} />
 
       <div className="relative mx-auto max-w-7xl px-6">
         <div className="flex justify-center">
@@ -135,100 +282,7 @@ export const Hero = () => {
           className="relative mt-16 flex items-center justify-center"
           style={{ perspective: "1600px" }}
         >
-          <FloatCard
-            className="absolute -left-2 top-10 w-[230px] hidden md:block"
-            style={{
-              transform: `translate3d(${parallax.x * -14}px, ${parallax.y * -10}px, 60px) rotate(-4deg)`,
-              transition: "transform .3s ease-out",
-            }}
-          >
-            <div className="flex items-center gap-2 text-[11px] text-ink-300 font-mono uppercase tracking-wider">
-              <Icons.Chart size={12} className="text-accent" /> Campaign · live
-            </div>
-            <div className="mt-2 text-[22px] font-display tracking-tight">412,808</div>
-            <div className="text-[11px] text-ink-400">messages sent · last 24h</div>
-            <div className="mt-3 grid grid-cols-3 gap-1.5">
-              <div className="rounded bg-white/5 px-1.5 py-1 text-center">
-                <div className="text-[10px] text-ink-400">DEL</div>
-                <div className="text-[12px] text-ink-100">98.7%</div>
-              </div>
-              <div className="rounded bg-white/5 px-1.5 py-1 text-center">
-                <div className="text-[10px] text-ink-400">READ</div>
-                <div className="text-[12px] text-accent">87.4%</div>
-              </div>
-              <div className="rounded bg-white/5 px-1.5 py-1 text-center">
-                <div className="text-[10px] text-ink-400">CTR</div>
-                <div className="text-[12px] text-ink-100">31.2%</div>
-              </div>
-            </div>
-          </FloatCard>
-
-          <FloatCard
-            className="absolute right-2 top-32 w-[230px] hidden md:block"
-            style={{
-              transform: `translate3d(${parallax.x * 18}px, ${parallax.y * -6}px, 100px) rotate(3deg)`,
-              transition: "transform .3s ease-out",
-            }}
-          >
-            <div className="flex items-center gap-2 text-[11px] text-ink-300 font-mono uppercase tracking-wider">
-              <Icons.Bell size={12} className="text-accent" /> Reminder sent
-            </div>
-            <div className="mt-2 text-[13px] text-ink-100 leading-snug">
-              Hyundai Service · 11 May
-              <br />
-              <span className="text-ink-300">Slot @ 9:30 AM</span>
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-[11px]">
-              <span className="rounded bg-accent/15 text-accent px-1.5 py-0.5">Confirmed</span>
-              <span className="rounded bg-white/5 text-ink-200 px-1.5 py-0.5">+₹4,200</span>
-            </div>
-          </FloatCard>
-
-          <FloatCard
-            className="absolute left-8 bottom-2 w-[220px] hidden md:block"
-            style={{
-              transform: `translate3d(${parallax.x * -10}px, ${parallax.y * 14}px, 40px) rotate(2deg)`,
-              transition: "transform .3s ease-out",
-            }}
-          >
-            <div className="flex items-center gap-2 text-[11px] text-ink-300 font-mono uppercase tracking-wider">
-              <Icons.Bolt size={12} className="text-accent" /> Flow · Salon
-            </div>
-            <div className="mt-2 space-y-1.5 text-[11.5px]">
-              <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Service selected
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Stylist picked
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" /> Awaiting payment
-              </div>
-              <div className="flex items-center gap-1.5 text-ink-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-ink-600" /> Reminder queued
-              </div>
-            </div>
-          </FloatCard>
-
-          <FloatCard
-            className="absolute right-6 bottom-6 w-[210px] hidden md:block"
-            style={{
-              transform: `translate3d(${parallax.x * 22}px, ${parallax.y * 12}px, 120px) rotate(-3deg)`,
-              transition: "transform .3s ease-out",
-            }}
-          >
-            <div className="flex items-center gap-2 text-[11px] text-ink-300 font-mono uppercase tracking-wider">
-              <Icons.Users size={12} className="text-accent" /> Segment built
-            </div>
-            <div className="mt-2 text-[12px] text-ink-100">
-              Lapsed customers · 90d
-              <br />
-              <span className="text-ink-300">28,419 contacts</span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-              <div className="h-full bg-accent" style={{ width: "72%" }} />
-            </div>
-          </FloatCard>
+          <ConversationDeck parallax={parallax} />
 
           <div
             className="relative"

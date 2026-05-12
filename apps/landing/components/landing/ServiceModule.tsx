@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icons } from "./Icons";
-import { BigHeading, Bubble, Reveal, SectionLabel, Sub } from "./Primitives";
+import { BigHeading, Bubble, Reveal, Scroll3D, SectionLabel, Sub } from "./Primitives";
 import { useScrollProgress } from "./hooks";
 
 type FlowMsg = {
@@ -342,9 +342,17 @@ export const ServiceModule = () => {
           </span>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div
+          className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6"
+          style={{ perspective: "2000px", perspectiveOrigin: "50% 30%" }}
+        >
           <div className="lg:col-span-7">
-            <div className="glass relative h-[560px] rounded-2xl p-4 overflow-hidden">
+            <Scroll3D
+              className="glass relative h-[560px] rounded-2xl p-4 overflow-hidden"
+              intensity={0.7}
+              lift={0.7}
+              axis="y"
+            >
               <div className="absolute inset-0 dot-grid opacity-30 [mask-image:linear-gradient(180deg,#000,transparent)]" />
               <div className="relative flex items-center justify-between">
                 <div className="text-[11px] font-mono uppercase tracking-wider text-ink-300">
@@ -359,11 +367,16 @@ export const ServiceModule = () => {
               <div className="relative mt-6 h-[470px]">
                 <FlowGraph industry={industry} progress={local} />
               </div>
-            </div>
+            </Scroll3D>
           </div>
 
           <div className="lg:col-span-5">
-            <div className="glass rounded-2xl p-2 sm:p-3 h-[560px] overflow-hidden flex flex-col">
+            <Scroll3D
+              className="glass rounded-2xl p-2 sm:p-3 h-[560px] overflow-hidden flex flex-col"
+              intensity={0.5}
+              lift={0.8}
+              axis="y"
+            >
               <div className="flex items-center gap-2 px-3 py-2 border-b hairline">
                 <div className="h-7 w-7 rounded-full bg-gradient-to-br from-accent to-accent-deep flex items-center justify-center text-[10px] font-bold text-[#042311]">
                   {data.label
@@ -460,7 +473,7 @@ export const ServiceModule = () => {
                   <Icons.Bolt size={11} /> avg reply 0.4s
                 </span>
               </div>
-            </div>
+            </Scroll3D>
           </div>
         </div>
 

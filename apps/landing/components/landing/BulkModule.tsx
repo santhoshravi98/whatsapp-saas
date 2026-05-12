@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Icons } from "./Icons";
-import { Bubble, BigHeading, Pill, Reveal, SectionLabel, Sub } from "./Primitives";
+import { BigHeading, Bubble, Pill, Reveal, Scroll3D, SectionLabel, Sub } from "./Primitives";
 import { useCountUp, useScrollProgress } from "./hooks";
 
 const steps = [
@@ -103,8 +103,11 @@ export const BulkModule = () => {
             </ol>
           </div>
 
-          <div className="lg:col-span-8">
-            <div className="glass rounded-2xl p-2 sm:p-3">
+          <div
+            className="lg:col-span-8"
+            style={{ perspective: "1800px", perspectiveOrigin: "50% 30%" }}
+          >
+            <Scroll3D className="glass rounded-2xl p-2 sm:p-3" intensity={0.6} lift={0.6}>
               <div className="flex items-center justify-between px-3 py-2 border-b hairline">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
@@ -297,7 +300,7 @@ export const BulkModule = () => {
                   </svg>
                 </div>
               </div>
-            </div>
+            </Scroll3D>
 
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-[12px] text-ink-300">
               {featureRow.map(([t, I]) => (
