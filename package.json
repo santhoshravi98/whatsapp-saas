@@ -8,6 +8,7 @@
     "dev:landing": "turbo dev --filter=@whatsapp-saas/landing",
     "dev:web": "turbo dev --filter=@whatsapp-saas/web-app",
     "dev:backend": "turbo dev --filter=@whatsapp-saas/backend",
+    "dev:automation": "turbo dev --filter=@whatsapp-saas/automation",
     "build": "turbo build",
     "lint": "turbo lint",
     "format": "prettier --write ."

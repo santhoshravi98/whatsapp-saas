@@ -1,0 +1,38 @@
+// Copy to terraform.tfvars (gitignored) and fill in.
+
+project_name = "wapi"
+app_base_url = "https://wapi.example.com"
+
+// Vercel
+vercel_api_token = ""
+vercel_team_id   = ""              // empty for personal accounts
+git_repository   = ""              // e.g. "your-handle/wapi" — empty to skip git linking
+
+// Cloudflare (only if create_r2_bucket = true)
+create_r2_bucket      = false
+cloudflare_api_token  = ""
+cloudflare_account_id = ""
+
+// Meta
+meta_app_secret        = ""
+meta_verify_token      = ""
+meta_phone_number_id   = ""
+meta_access_token      = ""
+meta_graph_api_version = "v21.0"
+
+// Supabase
+supabase_url               = ""
+supabase_service_role_key  = ""
+supabase_anon_key          = ""
+
+// Upstash QStash
+qstash_token               = ""
+qstash_current_signing_key = ""
+qstash_next_signing_key    = ""
+
+// Anthropic
+anthropic_api_key = ""
+anthropic_model   = "claude-haiku-4-5-20251001"
+
+// Sentry (optional)
+sentry_dsn = ""

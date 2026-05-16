@@ -7,8 +7,15 @@ A pnpm + Turbo monorepo skeleton for a WhatsApp SaaS product. This is a starter 
 - `apps/landing` — marketing website (Next.js)
 - `apps/web-app` — authenticated product dashboard (Next.js)
 - `services/backend` — Express API service
+- `services/automation` — WhatsApp + Claude agent service (Next.js App Router; ingests webhooks, runs per-tenant AI conversations, dispatches via QStash)
 - `packages/ui` — shared React UI components
 - `packages/utils` — shared TypeScript helpers
+
+## Cross-cutting folders
+
+- `supabase/migrations` — database schema and migrations (shared by all services)
+- `infrastructure/terraform` — Cloudflare / Vercel infra-as-code
+- `docs/` — architecture, runbook, setup guides
 
 ## Scripts
 
@@ -20,6 +27,7 @@ pnpm dev            # runs all three apps via Turbo
 pnpm dev:landing    # landing only
 pnpm dev:web        # web-app only
 pnpm dev:backend    # backend only
+pnpm dev:automation # automation service only
 pnpm build
 pnpm lint
 pnpm format
@@ -33,6 +41,7 @@ Each app/service uses its own committed development env file for local use:
 apps/landing/.env.development
 apps/web-app/.env.development
 services/backend/.env.development
+services/automation/.env.local      # copy from services/automation/.env.example
 ```
 
 Production env files live alongside (`.env.production`) and should be populated per deployment target.
@@ -42,6 +51,7 @@ Production env files live alongside (`.env.production`) and should be populated 
 - `apps/landing` — `http://localhost:3000`
 - `apps/web-app` — `http://localhost:3001`
 - `services/backend` — `http://localhost:4000`
+- `services/automation` — `http://localhost:3002` (Next dev server; configure with `PORT=3002`)
 
 ## Deployment
 
