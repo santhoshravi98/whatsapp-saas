@@ -1,11 +1,24 @@
 /**
  * Minimal structured logger. JSON to stdout — Vercel ingests this into Logs.
- * Use sparingly; Sentry handles errors, this is for traceable info events.
+ *
+ * The active RequestContext (requestId / tenantId / eventId) is auto-merged
+ * into every entry so a single inbound message is greppable end-to-end.
  */
+import { getContext } from "./context";
+
 type Level = "debug" | "info" | "warn" | "error";
 
 function log(level: Level, msg: string, fields: Record<string, unknown> = {}) {
-  const entry = { level, msg, ts: new Date().toISOString(), ...fields };
+  const ctx = getContext();
+  const entry = {
+    level,
+    msg,
+    ts: new Date().toISOString(),
+    ...(ctx?.requestId ? { requestId: ctx.requestId } : {}),
+    ...(ctx?.tenantId ? { tenantId: ctx.tenantId } : {}),
+    ...(ctx?.eventId  ? { eventId:  ctx.eventId  } : {}),
+    ...fields,
+  };
   const out = level === "error" || level === "warn" ? console.error : console.log;
   out(JSON.stringify(entry));
 }

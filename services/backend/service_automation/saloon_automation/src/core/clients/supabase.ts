@@ -54,8 +54,11 @@ export function tenantClient(tenantId: string) {
     from(table: string) {
       const t = () => sb.from(table);
       return {
-        select(columns: string = "*") {
-          return t().select(columns).eq("tenant_id", tenantId);
+        select(
+          columns: string = "*",
+          opts?: Parameters<ReturnType<typeof sb.from>["select"]>[1],
+        ) {
+          return t().select(columns, opts).eq("tenant_id", tenantId);
         },
         insert(rows: Row | Row[]) {
           return t().insert(withTenant(rows) as Row);

@@ -8,8 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
     "check:config": "tsx scripts/check-config.ts",
+    "deploy": "bash scripts/deploy.sh",
     "smoke": "tsx scripts/smoke-test.ts",
     "backfill:tenant-phone": "tsx scripts/backfill-tenant-phone.ts",
     "test:tenant-isolation": "tsx scripts/test-tenant-isolation.ts"
@@ -31,7 +34,8 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.18",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
   },
   "engines": {
     "node": ">=20"
