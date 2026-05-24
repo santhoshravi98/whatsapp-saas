@@ -17,13 +17,32 @@
 import type { ChatMessage } from "@/core/clients/claude";
 import type { TenantClient } from "@/core/clients/supabase";
 import type { Tenant } from "@/core/tenants/types";
+import type { ButtonsPayload, ListPayload } from "@/core/clients/whatsapp";
 
 export type SegmentContext = {
   tenant: Tenant;
   /** Tenant-scoped Supabase client. Use this for all DB writes in segment code. */
   tc: TenantClient;
-  user: { id: string; name: string | null; waId: string };
+  user: {
+    id: string;
+    name: string | null;
+    waId: string;
+    /** True when this user has chatted with us before (last_seen > created_at + 30 min). */
+    isReturning: boolean;
+    /**
+     * Title of the most-recent completed/confirmed/requested service for
+     * this user (lower-case). Useful for "want another haircut?" style
+     * prompts on returning customers. null when there's no booking history.
+     */
+    lastBookingService: string | null;
+  };
   conversation: { id: string };
+  /**
+   * Wall-clock time at the start of this turn. The processor sets this once
+   * per request so prompt builders can format tz-aware dates ("today is …")
+   * without each one re-computing. Tests inject a fixed value.
+   */
+  now: Date;
 };
 
 export type AgentRunInput = {
@@ -36,9 +55,35 @@ export type AgentRunResult = {
   usage?: Record<string, unknown>;
 };
 
+export type InteractiveReply =
+  | { kind: "buttons"; payload: ButtonsPayload }
+  | { kind: "list";    payload: ListPayload };
+
 export type ReplyHookResult = {
   /** Text actually sent to WhatsApp (markers stripped, etc.). */
   cleanText: string;
+  /**
+   * Optional interactive companion. When set, the processor sends the
+   * interactive message INSTEAD of `cleanText` — Meta's interactive types
+   * already include a body field that carries the conversational prose.
+   */
+  interactive?: InteractiveReply;
+};
+
+export type OwnerInbound = {
+  /** Sender's WhatsApp id (digits only). */
+  from: string;
+  /** Meta wa_message_id of the inbound. */
+  id: string;
+  /** Displayed text (button title or list row title). */
+  text: string;
+  /** Structured payload when the inbound was an interactive tap. */
+  interactive?: { type: "button_reply" | "list_reply"; id: string };
+};
+
+export type OwnerHookResult = {
+  /** True when the segment recognised this inbound and acted on it. */
+  handled: boolean;
 };
 
 export interface Segment {
@@ -59,4 +104,18 @@ export interface Segment {
    * If not implemented, the raw agent reply is sent verbatim.
    */
   onAgentReply?(ctx: SegmentContext, replyText: string): Promise<ReplyHookResult>;
+
+  /**
+   * Optional pre-empt hook for inbound messages from the salon's OWNER (not
+   * a customer). The processor calls this BEFORE customer flow. If the hook
+   * returns `{ handled: true }`, the processor short-circuits: no agent
+   * call, no outbound to the customer. The hook itself is responsible for
+   * any outbound (e.g. customer-facing confirmation).
+   *
+   * Use this for operator workflows like Confirm/Reject on a fresh booking.
+   */
+  tryHandleOwnerInbound?(
+    ctx: { tc: TenantClient; tenant: Tenant; now: Date },
+    inbound: OwnerInbound,
+  ): Promise<OwnerHookResult>;
 }

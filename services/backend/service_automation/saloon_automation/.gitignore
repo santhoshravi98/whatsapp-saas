@@ -14,3 +14,5 @@ dist/
 .DS_Store
 *.log
 .temp/
+.vercel
+.env*.local

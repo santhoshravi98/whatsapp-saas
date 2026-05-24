@@ -11,3 +11,5 @@ services/backend/secrets/
 .vercel
 .claude/
 .DS_Store
+supabase/.temp/
+tsconfig.tsbuildinfo

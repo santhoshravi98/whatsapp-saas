@@ -15,4 +15,11 @@ export type Tenant = {
    * Example for salon: { hours, address, services: [...] }
    */
   config: Record<string, unknown>;
+  /** IANA timezone (e.g. "Asia/Kolkata"). Used for booking display + hours. */
+  timezone: string;
+  /** NULL = unmetered. Otherwise: hard cap of billable Claude tokens / month. */
+  monthlyTokenCap: number | null;
+  monthlyTokensUsed: number;
+  /** ISO date (YYYY-MM-DD) of the first day of the current usage period. */
+  usagePeriodStart: string | null;
 };

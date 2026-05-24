@@ -24,11 +24,15 @@ export function qstashReceiver(): Receiver {
   return _receiver;
 }
 
-export async function enqueueProcessMessage(eventId: string): Promise<void> {
+export async function enqueueProcessMessage(
+  eventId: string,
+  opts: { requestId?: string } = {},
+): Promise<void> {
   await qstashClient().publishJSON({
     url: `${env.APP_BASE_URL}/api/jobs/process-message`,
     body: { eventId },
     retries: 5,
     deduplicationId: eventId,
+    headers: opts.requestId ? { "x-request-id": opts.requestId } : undefined,
   });
 }
